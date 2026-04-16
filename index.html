@@ -1,0 +1,516 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<title>ORDEN PPP — El sistema de ventas que su equipo necesita</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@300;400;500&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root{
+  --negro:#0a0a0a;--rojo:#e63946;--rojo2:#ff6b6b;
+  --crema:#f5f0e8;--crema2:#e8e0cc;--gris:#888;
+  --verde:#2d9e6b;--verde2:#1a7a50;--panel:#1a1917;
+  --borde:rgba(255,255,255,0.07);
+}
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html{scroll-behavior:smooth}
+body{background:var(--negro);color:var(--crema);font-family:'DM Sans',sans-serif;overflow-x:hidden;-webkit-font-smoothing:antialiased}
+
+/* GRAIN */
+body::before{content:'';position:fixed;inset:0;background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E");pointer-events:none;z-index:1000;opacity:.35}
+
+/* BARRA PROGRESO */
+.bprog{position:fixed;top:0;left:0;height:2px;background:var(--rojo);z-index:999;transition:width .1s}
+
+/* MARCA */
+.marca{position:fixed;top:20px;left:20px;font-family:'Bebas Neue',sans-serif;font-size:20px;letter-spacing:.1em;color:var(--crema);z-index:100;mix-blend-mode:difference}
+
+/* ── HERO ── */
+.hero{min-height:100svh;display:flex;flex-direction:column;justify-content:center;padding:80px 24px 48px;position:relative;overflow:hidden}
+.hero::after{content:'';position:absolute;top:-150px;right:-150px;width:400px;height:400px;background:radial-gradient(circle,rgba(230,57,70,.14) 0%,transparent 70%);pointer-events:none}
+
+.eyebrow{font-family:'DM Mono',monospace;font-size:10px;letter-spacing:.22em;text-transform:uppercase;color:var(--rojo);margin-bottom:24px;opacity:0;animation:fadeUp .6s ease .2s forwards}
+
+.hero-titulo{font-family:'Bebas Neue',sans-serif;font-size:clamp(52px,14vw,96px);line-height:.92;margin-bottom:28px;opacity:0;animation:fadeUp .8s ease .4s forwards}
+.rojo{color:var(--rojo)}
+
+.hero-sub{font-size:16px;font-weight:300;line-height:1.65;color:var(--crema2);max-width:440px;margin-bottom:40px;opacity:0;animation:fadeUp .8s ease .6s forwards}
+.hero-sub strong{color:var(--crema);font-weight:500}
+
+.btns-hero{display:flex;flex-direction:column;gap:12px;opacity:0;animation:fadeUp .8s ease .8s forwards}
+
+.btn-g{display:flex;align-items:center;justify-content:center;gap:10px;background:var(--rojo);color:#fff;font-family:'DM Mono',monospace;font-size:12px;letter-spacing:.12em;text-transform:uppercase;padding:16px 28px;text-decoration:none;transition:all .25s;border-radius:2px;font-weight:500}
+.btn-g:hover{background:#c9313d;transform:translateY(-1px);box-shadow:0 6px 24px rgba(230,57,70,.35)}
+
+.btn-v{display:flex;align-items:center;justify-content:center;gap:10px;background:transparent;color:var(--crema);border:1px solid rgba(255,255,255,.2);font-family:'DM Mono',monospace;font-size:12px;letter-spacing:.12em;text-transform:uppercase;padding:16px 28px;text-decoration:none;transition:all .25s;border-radius:2px}
+.btn-v:hover{border-color:rgba(255,255,255,.5);background:rgba(255,255,255,.04)}
+
+.hero-nota{margin-top:20px;font-size:11px;color:var(--gris);font-family:'DM Mono',monospace;letter-spacing:.08em;opacity:0;animation:fadeUp .8s ease 1s forwards}
+
+/* ── STATS ── */
+.stats{padding:28px 24px;border-top:1px solid var(--borde);border-bottom:1px solid var(--borde);display:flex;gap:0;overflow-x:auto;scrollbar-width:none}
+.stats::-webkit-scrollbar{display:none}
+.stat{flex-shrink:0;padding:0 24px;border-right:1px solid var(--borde)}
+.stat:first-child{padding-left:0}
+.stat:last-child{border-right:none}
+.stat-n{font-family:'Bebas Neue',sans-serif;font-size:36px;color:var(--crema);line-height:1}
+.stat-l{font-family:'DM Mono',monospace;font-size:9px;letter-spacing:.15em;color:var(--gris);text-transform:uppercase;margin-top:3px;line-height:1.4}
+
+/* ── SECCIÓN GENÉRICA ── */
+.sec{padding:64px 24px}
+.sec-label{font-family:'DM Mono',monospace;font-size:10px;letter-spacing:.28em;text-transform:uppercase;color:var(--rojo);margin-bottom:32px;display:flex;align-items:center;gap:14px}
+.sec-label::after{content:'';flex:1;height:1px;background:linear-gradient(to right,rgba(230,57,70,.4),transparent)}
+.sec-label.verde{color:var(--verde)}
+.sec-label.verde::after{background:linear-gradient(to right,rgba(45,158,107,.4),transparent)}
+.sec-label.blanco{color:rgba(255,255,255,.3)}
+.sec-label.blanco::after{background:linear-gradient(to right,rgba(255,255,255,.1),transparent)}
+
+h2.grande{font-family:'Bebas Neue',sans-serif;font-size:clamp(36px,9vw,64px);line-height:.95;margin-bottom:18px}
+.subtitulo{font-size:15px;font-weight:300;color:var(--crema2);line-height:1.65;margin-bottom:36px}
+
+/* ── CHECKBOXES ── */
+.check-item{display:flex;align-items:flex-start;gap:16px;padding:20px 0;border-bottom:1px solid var(--borde);cursor:pointer}
+.check-box{width:22px;height:22px;border:1.5px solid rgba(255,255,255,.2);flex-shrink:0;margin-top:2px;display:flex;align-items:center;justify-content:center;transition:all .25s;border-radius:2px}
+.check-box::after{content:'✕';color:var(--rojo);font-size:12px;font-weight:700;opacity:0;transform:scale(.5);transition:all .2s}
+.check-item.marcado .check-box{border-color:var(--rojo);background:rgba(230,57,70,.1)}
+.check-item.marcado .check-box::after{opacity:1;transform:scale(1)}
+.check-item.marcado .ctexto{color:var(--crema)}
+.check-item.marcado .ccosto{opacity:1;transform:translateX(0)}
+.ccontenido{flex:1}
+.ctexto{font-size:15px;font-weight:400;color:rgba(245,240,232,.5);line-height:1.4;transition:color .3s}
+.cdetalle{font-size:12px;color:var(--gris);margin-top:3px;font-style:italic}
+.ccosto{font-family:'DM Mono',monospace;font-size:12px;color:var(--rojo2);opacity:0;transform:translateX(8px);transition:all .3s .1s;margin-top:4px;display:block}
+
+.contador-bloque{margin-top:40px;padding:28px 24px;border:1px solid rgba(230,57,70,.25);background:rgba(230,57,70,.04);border-left:3px solid var(--rojo);display:none}
+.contador-bloque.visible{display:block;animation:fadeUp .4s ease}
+.contador-label{font-family:'DM Mono',monospace;font-size:10px;letter-spacing:.18em;color:var(--gris);text-transform:uppercase;margin-bottom:8px}
+.contador-numero{font-family:'Bebas Neue',sans-serif;font-size:56px;color:var(--rojo);line-height:1;margin-bottom:6px}
+.contador-desc{font-size:13px;color:var(--crema2);line-height:1.5}
+.contador-desc strong{color:var(--crema)}
+
+/* ROI BRIDGE */
+.roi-bridge{margin-top:24px;background:rgba(45,158,107,.06);border:1px solid rgba(45,158,107,.2);border-left:3px solid var(--verde);padding:20px 20px;display:none}
+.roi-bridge.visible{display:block;animation:fadeUp .4s ease .1s both}
+.roi-titulo{font-family:'DM Mono',monospace;font-size:10px;letter-spacing:.18em;text-transform:uppercase;color:var(--verde);margin-bottom:12px}
+.roi-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.roi-item{background:rgba(255,255,255,.04);padding:12px 14px;border-radius:4px}
+.roi-val{font-family:'Bebas Neue',sans-serif;font-size:28px;color:var(--crema);line-height:1}
+.roi-lbl{font-size:11px;color:var(--gris);margin-top:2px}
+.roi-conclusion{margin-top:14px;font-size:13px;color:var(--crema2);line-height:1.5}
+.roi-conclusion strong{color:var(--verde)}
+
+/* ── PRECIO ── */
+.precio-sec{background:var(--panel);padding:64px 24px;border-top:1px solid var(--borde)}
+.precio-card{border:1px solid rgba(255,255,255,.1);padding:28px 24px;margin-bottom:14px;position:relative;overflow:hidden}
+.precio-card.destacado{border-color:var(--verde);background:rgba(45,158,107,.04)}
+.precio-badge{position:absolute;top:16px;right:16px;background:var(--verde);color:#fff;font-family:'DM Mono',monospace;font-size:9px;letter-spacing:.12em;text-transform:uppercase;padding:4px 10px;border-radius:1px}
+.precio-nombre{font-family:'DM Mono',monospace;font-size:11px;letter-spacing:.15em;text-transform:uppercase;color:var(--gris);margin-bottom:10px}
+.precio-monto{font-family:'Bebas Neue',sans-serif;font-size:52px;color:var(--crema);line-height:1}
+.precio-per{font-size:13px;color:var(--gris);margin-top:3px;margin-bottom:18px}
+.precio-items{list-style:none;display:flex;flex-direction:column;gap:8px}
+.precio-items li{font-size:13px;color:var(--crema2);display:flex;align-items:flex-start;gap:10px}
+.precio-items li::before{content:'✓';color:var(--verde);font-weight:700;flex-shrink:0;margin-top:1px}
+.precio-items li.muted::before{content:'—';color:var(--gris)}
+.precio-items li.muted{color:var(--gris)}
+
+.vs-tabla{width:100%;border-collapse:collapse;margin-top:32px;font-size:12px}
+.vs-tabla th{padding:10px 12px;font-family:'DM Mono',monospace;font-size:9px;letter-spacing:.12em;text-transform:uppercase;color:var(--gris);border-bottom:1px solid var(--borde);text-align:left}
+.vs-tabla td{padding:11px 12px;border-bottom:1px solid var(--borde);vertical-align:middle;color:var(--crema2)}
+.vs-tabla td:first-child{font-weight:500;color:var(--crema)}
+.vs-tabla td.si{color:var(--verde);font-weight:700;text-align:center}
+.vs-tabla td.no{color:var(--gris);text-align:center}
+.vs-tabla td.dest{color:var(--verde);font-weight:700}
+.vs-tabla .thead-dest{color:var(--crema);font-weight:700}
+.vs-nota{font-size:11px;color:var(--gris);margin-top:14px;font-style:italic;font-family:'DM Mono',monospace}
+
+/* ── FEATURES ── */
+.features-grid{display:grid;grid-template-columns:1fr 1fr;gap:2px}
+.feat{background:rgba(255,255,255,.03);padding:22px 18px;border:1px solid var(--borde);transition:all .2s}
+.feat:hover{background:rgba(255,255,255,.06);border-color:rgba(255,255,255,.12)}
+.feat-icon{font-size:24px;margin-bottom:12px;display:block}
+.feat-t{font-family:'Bebas Neue',sans-serif;font-size:20px;letter-spacing:.03em;margin-bottom:6px;color:var(--crema)}
+.feat-d{font-size:13px;color:var(--gris);line-height:1.5;font-weight:300}
+
+/* ── TESTIMONIOS ── */
+.testi{background:rgba(255,255,255,.03);border:1px solid var(--borde);border-left:3px solid var(--rojo);padding:22px 20px;margin-bottom:12px}
+.testi.verde{border-left-color:var(--verde)}
+.testi-txt{font-size:14px;color:var(--crema2);line-height:1.65;font-style:italic;margin-bottom:14px}
+.testi-autor{font-family:'DM Mono',monospace;font-size:10px;letter-spacing:.1em;color:var(--gris);text-transform:uppercase}
+
+/* ── PERFIL ── */
+.perfil-sec{background:var(--panel);padding:64px 24px;border-top:1px solid var(--borde)}
+.perfil-inner{display:flex;flex-direction:column;gap:24px}
+.perfil-avatar{width:72px;height:72px;background:linear-gradient(135deg,var(--rojo),#a01f28);border-radius:4px;display:flex;align-items:center;justify-content:center;font-family:'Bebas Neue',sans-serif;font-size:28px;color:#fff;letter-spacing:.05em;flex-shrink:0}
+.perfil-nombre{font-family:'Bebas Neue',sans-serif;font-size:32px;line-height:.95;color:var(--crema)}
+.perfil-titulo{font-family:'DM Mono',monospace;font-size:11px;letter-spacing:.15em;color:var(--rojo);text-transform:uppercase;margin-top:6px;margin-bottom:16px}
+.perfil-txt{font-size:14px;font-weight:300;color:var(--crema2);line-height:1.7}
+.perfil-tags{display:flex;flex-wrap:wrap;gap:8px;margin-top:18px}
+.ptag{font-family:'DM Mono',monospace;font-size:10px;letter-spacing:.1em;text-transform:uppercase;padding:6px 12px;border:1px solid var(--borde);color:var(--gris)}
+
+/* ── CTA DOBLE FINAL ── */
+.cta-final{padding:72px 24px;text-align:center;position:relative;overflow:hidden}
+.cta-final::before{content:'';position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:600px;height:600px;background:radial-gradient(circle,rgba(230,57,70,.07) 0%,transparent 65%);pointer-events:none}
+.cta-titulo{font-family:'Bebas Neue',sans-serif;font-size:clamp(44px,11vw,80px);line-height:.95;margin-bottom:18px}
+.cta-sub{font-size:15px;font-weight:300;color:var(--gris);margin-bottom:36px;max-width:380px;margin-left:auto;margin-right:auto;line-height:1.6}
+
+.cta-btns{display:flex;flex-direction:column;gap:12px;max-width:360px;margin:0 auto 32px}
+.cta-btn-g{display:flex;align-items:center;justify-content:center;gap:10px;background:var(--rojo);color:#fff;font-family:'DM Mono',monospace;font-size:12px;letter-spacing:.12em;text-transform:uppercase;padding:18px 24px;text-decoration:none;border-radius:2px;transition:all .25s;font-weight:500}
+.cta-btn-g:hover{background:#c9313d;transform:translateY(-1px)}
+.cta-btn-v{display:flex;align-items:center;justify-content:center;gap:10px;background:transparent;color:var(--crema);border:1px solid rgba(255,255,255,.2);font-family:'DM Mono',monospace;font-size:12px;letter-spacing:.12em;text-transform:uppercase;padding:18px 24px;text-decoration:none;border-radius:2px;transition:all .25s}
+.cta-btn-v:hover{border-color:rgba(255,255,255,.5)}
+
+.garantia{font-size:12px;color:var(--gris);font-family:'DM Mono',monospace;letter-spacing:.06em;margin-bottom:48px}
+.garantia span{color:var(--verde)}
+
+.firma{padding-top:32px;border-top:1px solid var(--borde);font-family:'DM Mono',monospace;font-size:10px;letter-spacing:.12em;color:rgba(255,255,255,.15);text-transform:uppercase}
+
+/* ANIMACIONES */
+@keyframes fadeUp{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}
+.anim{opacity:0}
+.anim.visible{animation:fadeUp .6s ease forwards}
+</style>
+</head>
+<body>
+
+<div class="bprog" id="bprog"></div>
+<div class="marca">ORDEN PPP</div>
+
+<!-- ══════ HERO ══════ -->
+<section class="hero">
+  <div class="eyebrow">Para dueños y gerentes de equipos comerciales</div>
+  <h1 class="hero-titulo">
+    <span class="rojo">¿Cuánto dinero</span><br>
+    se queda en la mesa<br>cada semana?
+  </h1>
+  <p class="hero-sub">
+    No es mala suerte ni el mercado.<br>
+    Son <strong>prospectos que nadie siguió.</strong><br>
+    Cierres que murieron en un cuaderno.
+  </p>
+  <div class="btns-hero">
+    <a href="demo-gerente.html" class="btn-g">Ver demo del gerente →</a>
+    <a href="demo-vendedor.html" class="btn-v">Ver demo del vendedor →</a>
+  </div>
+  <div class="hero-nota">Sin registro · Sin tarjeta · Solo explore</div>
+</section>
+
+<!-- ══════ STATS ══════ -->
+<div class="stats">
+  <div class="stat"><div class="stat-n">73%</div><div class="stat-l">Prospectos sin<br>seguimiento</div></div>
+  <div class="stat"><div class="stat-n">5×</div><div class="stat-l">Más cierres con<br>sistema</div></div>
+  <div class="stat"><div class="stat-n">+30</div><div class="stat-l">Años de experiencia<br>en ventas</div></div>
+  <div class="stat"><div class="stat-n">2 días</div><div class="stat-l">Para estar<br>operativo</div></div>
+</div>
+
+<!-- ══════ DIAGNÓSTICO ══════ -->
+<section class="sec" id="diagnostico">
+  <div class="sec-label">Diagnóstico</div>
+  <h2 class="grande">La realidad de<br>tu equipo hoy</h2>
+  <p class="subtitulo">Toca cada situación que reconoces. Mira cuánto te está costando en tiempo real.</p>
+
+  <div id="checksGrid">
+    <div class="check-item" onclick="marcar(this,280)">
+      <div class="check-box"></div>
+      <div class="ccontenido">
+        <div class="ctexto">Tus vendedores usan cuaderno, notas del celular y WhatsApp al mismo tiempo para llevar sus prospectos</div>
+        <div class="cdetalle">La información queda dispersa. Nadie sabe qué está pasando realmente.</div>
+        <span class="ccosto">≈ $280/mes perdidos por vendedor</span>
+      </div>
+    </div>
+    <div class="check-item" onclick="marcar(this,420)">
+      <div class="check-box"></div>
+      <div class="ccontenido">
+        <div class="ctexto">No sabes en tiempo real cuántos prospectos activos tiene cada vendedor</div>
+        <div class="cdetalle">Tienes que preguntar. Y lo que te dicen no siempre es exacto.</div>
+        <span class="ccosto">≈ $420/mes en decisiones a ciegas</span>
+      </div>
+    </div>
+    <div class="check-item" onclick="marcar(this,350)">
+      <div class="check-box"></div>
+      <div class="ccontenido">
+        <div class="ctexto">Los prospectos "se enfrían" porque nadie los contactó a tiempo</div>
+        <div class="cdetalle">No fue falta de interés del cliente. Fue falta de seguimiento del vendedor.</div>
+        <span class="ccosto">≈ $350/mes en cierres perdidos</span>
+      </div>
+    </div>
+    <div class="check-item" onclick="marcar(this,190)">
+      <div class="check-box"></div>
+      <div class="ccontenido">
+        <div class="ctexto">Las reuniones dependen de lo que cada vendedor "recuerda" reportar</div>
+        <div class="cdetalle">No hay datos. Hay historias. La diferencia es enorme.</div>
+        <span class="ccosto">≈ $190/mes en tiempo gerencial perdido</span>
+      </div>
+    </div>
+    <div class="check-item" onclick="marcar(this,510)">
+      <div class="check-box"></div>
+      <div class="ccontenido">
+        <div class="ctexto">Cuando un vendedor sale, se lleva todos sus contactos e historial</div>
+        <div class="cdetalle">La relación con esos prospectos se va con él. La empresa no tiene nada.</div>
+        <span class="ccosto">≈ $510/mes en capital relacional volátil</span>
+      </div>
+    </div>
+    <div class="check-item" onclick="marcar(this,240)">
+      <div class="check-box"></div>
+      <div class="ccontenido">
+        <div class="ctexto">Tu equipo no sabe cuál es el siguiente paso concreto con cada prospecto</div>
+        <div class="cdetalle">Actúan por impulso, no por sistema. Las oportunidades se caen entre los dedos.</div>
+        <span class="ccosto">≈ $240/mes en oportunidades sin acción</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- CONTADOR COSTO -->
+  <div class="contador-bloque" id="contadorBloque">
+    <div class="contador-label">Costo mensual estimado del caos</div>
+    <div class="contador-numero" id="contadorNumero">$0</div>
+    <div class="contador-desc">en prospectos perdidos, tiempo mal invertido y cierres que nunca ocurrieron.<br><strong>Este dinero ya existe en tu empresa — solo falta el sistema para no perderlo.</strong></div>
+  </div>
+
+  <!-- ROI BRIDGE -->
+  <div class="roi-bridge" id="roiBridge">
+    <div class="roi-titulo">¿Cuánto cuesta la solución?</div>
+
+    <div style="margin-bottom:16px">
+      <label style="font-family:'DM Mono',monospace;font-size:10px;letter-spacing:.18em;text-transform:uppercase;color:var(--gris);display:block;margin-bottom:8px">¿Cuántos vendedores tiene tu equipo?</label>
+      <div style="display:flex;align-items:center;gap:0;border:1px solid rgba(45,158,107,.3);border-radius:4px;overflow:hidden;width:fit-content">
+        <button onclick="cambiarVendedores(-1)" style="width:40px;height:40px;background:rgba(255,255,255,.04);border:none;color:var(--crema);font-size:20px;cursor:pointer;font-family:'DM Mono',monospace;transition:background .15s" onmouseover="this.style.background='rgba(255,255,255,.08)'" onmouseout="this.style.background='rgba(255,255,255,.04)'">−</button>
+        <div id="roiVendedores" style="width:52px;height:40px;display:flex;align-items:center;justify-content:center;font-family:'Bebas Neue',sans-serif;font-size:26px;color:var(--crema);background:rgba(45,158,107,.06)">4</div>
+        <button onclick="cambiarVendedores(1)" style="width:40px;height:40px;background:rgba(255,255,255,.04);border:none;color:var(--crema);font-size:20px;cursor:pointer;font-family:'DM Mono',monospace;transition:background .15s" onmouseover="this.style.background='rgba(255,255,255,.08)'" onmouseout="this.style.background='rgba(255,255,255,.04)'">+</button>
+      </div>
+    </div>
+
+    <div class="roi-grid">
+      <div class="roi-item">
+        <div class="roi-val" id="roiCosto">$0</div>
+        <div class="roi-lbl">Costo del caos / mes</div>
+      </div>
+      <div class="roi-item">
+        <div class="roi-val" id="roiInversion">$140</div>
+        <div class="roi-lbl">ORDEN PPP / mes</div>
+      </div>
+      <div class="roi-item" style="grid-column:1/-1;background:rgba(45,158,107,.08);border:1px solid rgba(45,158,107,.2)">
+        <div class="roi-val" style="color:var(--verde)" id="roiRetorno">—</div>
+        <div class="roi-lbl">Retorno sobre inversión</div>
+      </div>
+    </div>
+    <div class="roi-conclusion" id="roiConclusion">Complete el diagnóstico arriba para ver su ROI personalizado.</div>
+  </div>
+</section>
+
+<!-- ══════ FEATURES ══════ -->
+<section class="sec" style="background:var(--panel);padding-top:56px;padding-bottom:56px">
+  <div class="sec-label verde">La solución</div>
+  <h2 class="grande" style="color:var(--crema)">Un sistema.<br><span style="color:var(--verde)">Un solo lugar.</span><br>Todo el equipo.</h2>
+  <p class="subtitulo">ORDEN PPP convierte el caos de cuadernos, Excel y WhatsApp en un pipeline claro, con seguimiento automático y visibilidad total.</p>
+  <div class="features-grid">
+    <div class="feat anim"><span class="feat-icon">🗂️</span><div class="feat-t">Pipeline visual</div><div class="feat-d">Cada prospecto en su etapa. De la primera llamada al cierre. En tiempo real.</div></div>
+    <div class="feat anim"><span class="feat-icon">⏰</span><div class="feat-t">Seguimiento con fecha</div><div class="feat-d">El sistema recuerda cuándo llamar. Los vendedores no dependen de su memoria.</div></div>
+    <div class="feat anim"><span class="feat-icon">📊</span><div class="feat-t">Dashboard gerente</div><div class="feat-d">KPIs, metas, proyecciones, vendedor top y rezagado. Sin preguntar a nadie.</div></div>
+    <div class="feat anim"><span class="feat-icon">📱</span><div class="feat-t">Desde el celular</div><div class="feat-d">PWA nativa. Sin instalar nada. Funciona en campo, sin internet.</div></div>
+    <div class="feat anim"><span class="feat-icon">🏢</span><div class="feat-t">Su empresa retiene el capital</div><div class="feat-d">Cuando un vendedor sale, sus prospectos y historial se quedan. Son tuyos.</div></div>
+    <div class="feat anim"><span class="feat-icon">⚡</span><div class="feat-t">Operativo en 2 días</div><div class="feat-d">Sin servidores ni TI. Sin semanas de configuración. Tu equipo opera hoy.</div></div>
+  </div>
+</section>
+
+<!-- ══════ PRECIO ══════ -->
+<section class="precio-sec">
+  <div class="sec-label verde">Inversión</div>
+  <h2 class="grande">Precio claro.<br><span style="color:var(--verde)">Sin sorpresas.</span></h2>
+  <p class="subtitulo">Sin contrato de permanencia. Sin letra pequeña. Cancela cuando quieras.</p>
+
+  <div class="precio-card destacado">
+    <div class="precio-nombre">Desde</div>
+    <div class="precio-monto" style="color:var(--verde)">$35</div>
+    <div class="precio-per">por usuario / mes</div>
+    <ul class="precio-items">
+      <li>Gestión completa de prospectos</li>
+      <li>Pipeline en 5 etapas</li>
+      <li>Seguimientos con recordatorio</li>
+      <li>Historial de actividad completo</li>
+      <li>WhatsApp directo desde la app</li>
+      <li>Funciona desde cualquier celular</li>
+      <li style="margin-top:8px;padding-top:8px;border-top:1px solid rgba(255,255,255,0.08)">Dashboard gerencial completo</li>
+      <li>KPIs, metas y proyecciones</li>
+      <li>Salud de cartera y alertas</li>
+      <li>Reportes de productos y rentabilidad</li>
+      <li>Historial 6 meses por vendedor</li>
+      <li>Configuración personalizada a tu operación</li>
+      <li>Soporte directo con el creador</li>
+    </ul>
+  </div>
+
+  <!-- COMPARATIVO -->
+  <h3 style="font-family:'Bebas Neue',sans-serif;font-size:28px;color:var(--crema);margin:40px 0 16px;line-height:1">¿Por qué no un CRM internacional?</h3>
+  <div style="overflow-x:auto">
+    <table class="vs-tabla" style="min-width:420px">
+      <thead>
+        <tr>
+          <th>Característica</th>
+          <th class="thead-dest">ORDEN PPP</th>
+          <th>Salesforce / HubSpot</th>
+          <th>Pipedrive</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr><td>Precio base / usuario</td><td class="dest">Desde $35</td><td class="no">$75–150+</td><td class="no">$49–99</td></tr>
+        <tr><td>Idioma y mercado</td><td class="dest">Ecuador 🇪🇨</td><td class="no">EE.UU. 🇺🇸</td><td class="no">EE.UU. 🇺🇸</td></tr>
+        <tr><td>Tiempo para operar</td><td class="dest">2 días</td><td class="no">Semanas/meses</td><td class="no">1–2 semanas</td></tr>
+        <tr><td>Soporte</td><td class="dest">Directo con el creador</td><td class="no">Ticket en inglés</td><td class="no">Chat / correo</td></tr>
+        <tr><td>Diseñado para este mercado</td><td class="si">✓</td><td class="no">✗</td><td class="no">✗</td></tr>
+        <tr><td>Construido por vendedor real</td><td class="si">✓ 30 años</td><td class="no">✗</td><td class="no">✗</td></tr>
+        <tr><td>Sin contrato de permanencia</td><td class="si">✓</td><td class="no">✗ Anual</td><td class="no">✗ Anual</td></tr>
+        <tr><td>Configuración a medida incluida</td><td class="si">✓</td><td class="no">$$ extra</td><td class="no">$$ extra</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <div class="vs-nota">* Precios en USD. Planes base de cada proveedor.</div>
+</section>
+
+<!-- ══════ TESTIMONIOS ══════ -->
+<section class="sec">
+  <div class="sec-label">Voces del mercado</div>
+  <h2 class="grande">Lo que dicen<br>quienes lo vivieron</h2>
+
+  <div class="testi">
+    <div class="testi-txt">"Tenía cuatro vendedores y ninguno sabía exactamente cuántos prospectos tenía activos. Me decían números distintos en cada reunión. El problema no era la deshonestidad — era que ellos tampoco lo sabían. Necesitaba ver todo en un solo lugar, en tiempo real, sin tener que preguntar."</div>
+    <div class="testi-autor">Gerente Comercial · Empresa de seguros · Guayaquil</div>
+  </div>
+
+  <div class="testi verde">
+    <div class="testi-txt">"Probamos un CRM americano. Costaba el doble, tardamos tres semanas en configurarlo, nadie lo entendía y el soporte era en inglés. A los pocos meses ya nadie lo usaba. Lo que necesitamos es algo que funcione como nosotros trabajamos, no como trabajan en San Francisco."</div>
+    <div class="testi-autor">Jefe de Ventas · Inmobiliaria · Guayaquil</div>
+  </div>
+
+  <div class="testi">
+    <div class="testi-txt">"Yo tenía mis prospectos en Excel, mis notas en el celular, mis citas en Google Calendar y mis conversaciones en WhatsApp. Cuando un cliente me llamaba y me preguntaba algo, tenía que abrir cuatro cosas antes de poder responderle. Era un caos. Y lo peor: me hacía ver poco profesional."</div>
+    <div class="testi-autor">Vendedor senior · Servicios financieros · Guayaquil</div>
+  </div>
+
+  <div class="testi verde">
+    <div class="testi-txt">"Mi mayor miedo siempre fue que si un vendedor se iba, se llevaba todo. Sus contactos, sus conversaciones, su relación con los clientes. Lo que quiero es que esa información sea de la empresa, no de la persona."</div>
+    <div class="testi-autor">Director Comercial · Distribuidora · Guayaquil</div>
+  </div>
+</section>
+
+<!-- ══════ PERFIL ══════ -->
+<section class="perfil-sec">
+  <div class="sec-label blanco">Quién lo construyó</div>
+  <div class="perfil-inner">
+    <div style="display:flex;align-items:center;gap:18px">
+      <div class="perfil-avatar">AP</div>
+      <div>
+        <div class="perfil-nombre">Alfredo<br>Pérez</div>
+        <div class="perfil-titulo">El Profe de Ventas</div>
+      </div>
+    </div>
+    <div>
+      <p class="perfil-txt">Más de 30 años formando equipos comerciales en Ecuador. He visto de cerca el caos que genera operar con cuadernos, Excel, WhatsApp y agendas dispersas — y lo que le cuesta a las empresas en cierres perdidos y clientes mal atendidos.</p>
+      <p class="perfil-txt" style="margin-top:12px">ORDEN PPP no nació en una sala de juntas en otro país. Nació de entender cómo vende un vendedor ecuatoriano: desde el campo, desde el celular, desde la realidad de este mercado. Cada función de esta herramienta responde a un problema que vi repetirse durante tres décadas.</p>
+      <p class="perfil-txt" style="margin-top:12px">Y cuando algo no funciona para tu equipo, no hablas con un bot ni abres un ticket. Hablas directamente conmigo.</p>
+    </div>
+    <div class="perfil-tags">
+      <span class="ptag">+30 años en ventas</span>
+      <span class="ptag">Formador de equipos</span>
+      <span class="ptag">Escuela de Vendedores</span>
+      <span class="ptag">Hecho en Ecuador</span>
+      <span class="ptag">Soporte directo</span>
+    </div>
+  </div>
+</section>
+
+<!-- ══════ CTA FINAL ══════ -->
+<section class="cta-final">
+  <h2 class="cta-titulo">
+    Mira cómo funciona.<br>
+    <span class="rojo">Decide hoy.</span>
+  </h2>
+  <p class="cta-sub">No es una presentación. Es la herramienta real. Explora el demo de su rol ahora mismo, en 5 minutos.</p>
+
+  <div class="cta-btns">
+    <a href="demo-gerente.html" class="cta-btn-g">Soy gerente / dueño →</a>
+    <a href="demo-vendedor.html" class="cta-btn-v">Soy vendedor →</a>
+  </div>
+
+  <div class="garantia">
+    <span>✓</span> Sin contrato de permanencia &nbsp;·&nbsp;
+    <span>✓</span> Cancela cuando quieras &nbsp;·&nbsp;
+    <span>✓</span> Tu data es suya
+  </div>
+
+  <div class="firma">Nueva Órbita · nuevaorbita.com · Construido por vendedores, para vendedores</div>
+</section>
+
+<script>
+window.addEventListener('scroll',()=>{
+  const s=document.documentElement.scrollTop;
+  const h=document.documentElement.scrollHeight-document.documentElement.clientHeight;
+  document.getElementById('bprog').style.width=(s/h*100)+'%';
+});
+
+// IntersectionObserver animaciones
+const obs=new IntersectionObserver(entries=>{
+  entries.forEach(e=>{if(e.isIntersecting){e.target.classList.add('visible');obs.unobserve(e.target)}});
+},{threshold:.1});
+document.querySelectorAll('.anim').forEach(el=>obs.observe(el));
+
+// Checkboxes
+let total=0;
+const marcados=new Set();
+
+function marcar(el,monto){
+  if(marcados.has(el)){marcados.delete(el);el.classList.remove('marcado');total-=monto;}
+  else{marcados.add(el);el.classList.add('marcado');total+=monto;}
+  actualizarContador();
+}
+
+function actualizarContador(){
+  const cb=document.getElementById('contadorBloque');
+  const rb=document.getElementById('roiBridge');
+  const cn=document.getElementById('contadorNumero');
+
+  if(total>0){
+    cb.classList.add('visible');
+    rb.classList.add('visible');
+    animarNum(cn,total);
+    recalcularROI();
+  } else {
+    cb.classList.remove('visible');
+    rb.classList.remove('visible');
+  }
+}
+
+let numVendedores=4;
+
+function cambiarVendedores(delta){
+  numVendedores=Math.max(1,Math.min(20,numVendedores+delta));
+  document.getElementById('roiVendedores').textContent=numVendedores;
+  if(total>0) recalcularROI();
+}
+
+function recalcularROI(){
+  const inversion=numVendedores*35;
+  const retorno=total>0?Math.round(total/inversion):0;
+  document.getElementById('roiCosto').textContent='$'+total.toLocaleString('es-EC');
+  document.getElementById('roiInversion').textContent='$'+inversion.toLocaleString('es-EC');
+  document.getElementById('roiRetorno').textContent=retorno>0?retorno+'×':'—';
+  document.getElementById('roiConclusion').innerHTML=
+    'Con <strong>'+numVendedores+' vendedor'+(numVendedores>1?'es':'')+
+    '</strong>, ORDEN PPP cuesta a partir de <strong style="color:var(--verde)">$'+inversion.toLocaleString('es-EC')+'/mes</strong>.<br>'+
+    'El caos que marcaste cuesta <strong style="color:var(--rojo)">$'+total.toLocaleString('es-EC')+'/mes</strong>.<br>'+
+    'La diferencia habla sola.';
+}
+
+function animarNum(el,dest){
+  const dur=600,start=Date.now();
+  const init=parseInt(el.textContent.replace(/\D/g,''))||0;
+  (function paso(){
+    const t=Math.min((Date.now()-start)/dur,1);
+    const ease=1-Math.pow(1-t,3);
+    el.textContent='$'+(Math.round(init+(dest-init)*ease)).toLocaleString('es-EC');
+    if(t<1)requestAnimationFrame(paso);
+  })();
+}
+</script>
+</body>
+</html>

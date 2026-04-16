@@ -1,0 +1,819 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<title>ORDEN PPP</title>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#f0efe9;--panel:#fff;--negro:#18181b;--texto:#27272a;--muted:#71717a;
+  --borde:#e4e4e7;--azul:#2563eb;--verde:#16a34a;--rojo:#dc2626;--am:#d97706;
+  --morado:#7c3aed;--tab:64px;--top:52px;--ban:30px;
+}
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{height:100%;overflow:hidden}
+body{font-family:'Plus Jakarta Sans',sans-serif;background:var(--bg);color:var(--texto);font-size:14px;-webkit-font-smoothing:antialiased}
+
+.banner{position:fixed;top:0;left:0;right:0;height:var(--ban);background:var(--negro);display:flex;align-items:center;justify-content:center;font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:.15em;color:rgba(255,255,255,.4);z-index:100}
+.banner span{color:#facc15}
+
+.topbar{position:fixed;top:var(--ban);left:0;right:0;height:var(--top);background:var(--panel);border-bottom:1px solid var(--borde);display:flex;align-items:center;padding:0 16px;gap:10px;z-index:90}
+.tlogo{font-size:17px;font-weight:800;color:var(--negro);letter-spacing:.04em;flex:1}
+.ibtn{width:36px;height:36px;background:var(--bg);border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:17px;cursor:pointer;border:none;position:relative}
+.ndot{position:absolute;top:7px;right:7px;width:7px;height:7px;background:var(--rojo);border-radius:50%;border:1.5px solid var(--panel)}
+.tavatar{width:36px;height:36px;background:var(--negro);border-radius:10px;display:flex;align-items:center;justify-content:center;color:#fff;font-size:11px;font-weight:700}
+
+.sa{position:fixed;top:calc(var(--ban) + var(--top));bottom:var(--tab);left:0;right:0;overflow-y:auto;-webkit-overflow-scrolling:touch;padding:14px 14px 8px}
+
+.tabs{position:fixed;bottom:0;left:0;right:0;height:var(--tab);background:var(--panel);border-top:1px solid var(--borde);display:flex;z-index:90;padding-bottom:env(safe-area-inset-bottom)}
+.tab{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;cursor:pointer;border:none;background:none;padding-top:6px}
+.ticon{font-size:19px;line-height:1;transition:transform .2s}
+.tlbl{font-size:10px;font-weight:600;color:var(--muted)}
+.tab.activo .tlbl{color:var(--negro)}
+.tab.activo .ticon{transform:translateY(-2px)}
+.tline{position:absolute;top:0;width:28px;height:2.5px;background:var(--negro);border-radius:0 0 3px 3px;transition:left .3s cubic-bezier(.34,1.56,.64,1)}
+
+/* COMPONENTES COMUNES */
+.card{background:var(--panel);border-radius:14px;border:1px solid var(--borde);overflow:hidden;margin-bottom:10px}
+.card-h{padding:13px 16px 11px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid var(--borde)}
+.card-t{font-size:13px;font-weight:700;color:var(--negro)}
+.card-m{font-size:11px;color:var(--muted)}
+.card-b{padding:14px 16px}
+
+.sl{font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.1em;margin:16px 0 8px;display:flex;align-items:center;justify-content:space-between}
+.sl:first-child{margin-top:0}
+.sv{font-size:11px;color:var(--azul);font-weight:600;cursor:pointer;text-transform:none;letter-spacing:0}
+
+.badge{display:inline-flex;align-items:center;justify-content:center;min-width:18px;height:18px;background:var(--rojo);color:#fff;font-size:10px;font-weight:700;border-radius:9px;padding:0 5px;font-family:'JetBrains Mono',monospace}
+.badge-v{background:var(--verde)}
+.badge-a{background:var(--am)}
+
+/* KPI GRID */
+.kgrid{display:grid;grid-template-columns:1fr 1fr;gap:9px;margin-bottom:4px}
+.kgrid3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:9px;margin-bottom:4px}
+.kpi{background:var(--panel);border-radius:14px;border:1px solid var(--borde);padding:14px 14px 12px;position:relative;overflow:hidden}
+.kpi-n{font-size:28px;font-weight:800;color:var(--negro);line-height:1;margin-bottom:3px;font-family:'JetBrains Mono',monospace}
+.kpi-l{font-size:11px;color:var(--muted);font-weight:500;line-height:1.3}
+.kpi-s{position:absolute;bottom:0;left:0;right:0;height:3px}
+.kpi-sub{font-size:10px;color:var(--muted);margin-top:4px;font-family:'JetBrains Mono',monospace}
+.kpi-small .kpi-n{font-size:20px}
+
+/* TENDENCIA */
+.trend-up{color:var(--verde);font-size:11px;font-weight:700}
+.trend-dn{color:var(--rojo);font-size:11px;font-weight:700}
+.trend-eq{color:var(--muted);font-size:11px;font-weight:700}
+
+/* ROWS */
+.prow{display:flex;align-items:center;gap:11px;padding:12px 16px;border-bottom:1px solid var(--borde);cursor:pointer}
+.prow:last-child{border-bottom:none}
+.prow:active{background:var(--bg)}
+.pdot{width:9px;height:9px;border-radius:50%;flex-shrink:0}
+.pinfo{flex:1;min-width:0}
+.pn{font-size:13px;font-weight:700;color:var(--negro);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.ps{font-size:11px;color:var(--muted);margin-top:1px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.pright{text-align:right;flex-shrink:0}
+.pf{font-family:'JetBrains Mono',monospace;font-size:11px;font-weight:600}
+.pv{font-size:11px;color:var(--verde);font-weight:600;margin-top:2px}
+
+/* BARRAS */
+.btrack{height:6px;background:var(--bg);border-radius:3px;overflow:hidden;margin-top:6px}
+.bfill{height:100%;border-radius:3px;transition:width 1s ease}
+
+/* TABLA */
+.tabla{width:100%;border-collapse:collapse;font-size:12px}
+.tabla th{text-align:left;padding:8px 10px;font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.08em;border-bottom:1px solid var(--borde);font-weight:600;white-space:nowrap}
+.tabla td{padding:10px 10px;border-bottom:1px solid var(--borde);color:var(--texto)}
+.tabla tr:last-child td{border-bottom:none}
+.tabla tr:active td{background:var(--bg)}
+
+/* CHART MINI */
+.bars{display:flex;align-items:flex-end;gap:4px;height:60px;padding:0 2px}
+.bar-col{flex:1;display:flex;flex-direction:column;align-items:center;gap:3px}
+.bar-fill{width:100%;border-radius:3px 3px 0 0;transition:height 1s ease;min-height:2px}
+.bar-lbl{font-size:9px;color:var(--muted);font-weight:600;white-space:nowrap}
+
+/* ALERT STRIP */
+.alert{display:flex;align-items:flex-start;gap:10px;padding:12px 14px;border-radius:10px;margin-bottom:8px;font-size:12px;line-height:1.4}
+.alert-r{background:#fef2f2;border:1px solid #fecaca;color:#991b1b}
+.alert-a{background:#fffbeb;border:1px solid #fde68a;color:#92400e}
+.alert-v{background:#f0fdf4;border:1px solid #bbf7d0;color:#14532d}
+.alert-b{background:#eff6ff;border:1px solid #bfdbfe;color:#1e40af}
+.alert-ico{font-size:16px;flex-shrink:0;margin-top:1px}
+.alert-txt strong{display:block;font-weight:700;margin-bottom:1px}
+
+/* PIPELINE FILTROS */
+.esc{display:flex;gap:7px;overflow-x:auto;padding-bottom:4px;margin-bottom:12px;scrollbar-width:none;-webkit-overflow-scrolling:touch}
+.esc::-webkit-scrollbar{display:none}
+.echip{display:flex;align-items:center;gap:5px;padding:6px 12px;border-radius:20px;font-size:12px;font-weight:600;white-space:nowrap;cursor:pointer;flex-shrink:0;border:1.5px solid var(--borde);background:var(--panel);color:var(--muted)}
+.echip.activo{background:var(--negro);color:#fff;border-color:var(--negro)}
+.ecdot{width:6px;height:6px;border-radius:50%}
+
+/* PROSPECT CARD */
+.pcf{background:var(--panel);border-radius:14px;border:1px solid var(--borde);padding:15px;margin-bottom:9px;cursor:pointer;overflow:hidden}
+.pcf:active{transform:scale(.99)}
+.pcf-stripe{height:3px;margin:-15px -15px 13px;border-radius:0}
+.pcf-top{display:flex;align-items:flex-start;justify-content:space-between;gap:8px;margin-bottom:9px}
+.pcf-n{font-size:14px;font-weight:800;color:var(--negro);line-height:1.2}
+.pcf-c{font-size:12px;color:var(--muted);margin-top:2px}
+.pcf-val{font-family:'JetBrains Mono',monospace;font-size:13px;color:var(--verde);font-weight:600;white-space:nowrap}
+.pcf-foot{display:flex;align-items:center;gap:7px}
+.pcf-vt{font-size:11px;color:var(--muted);background:var(--bg);padding:3px 7px;border-radius:6px;font-weight:600}
+.pcf-fecha{font-family:'JetBrains Mono',monospace;font-size:11px;font-weight:600;margin-left:auto}
+
+/* EQUIPO */
+.ecard{background:var(--panel);border-radius:14px;border:1px solid var(--borde);overflow:hidden;margin-bottom:10px;cursor:pointer}
+.etop{display:flex;align-items:center;gap:12px;padding:13px 16px;border-bottom:1px solid var(--borde)}
+.eav{width:40px;height:40px;border-radius:11px;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:14px;color:#fff}
+.en{font-size:14px;font-weight:800;color:var(--negro)}
+.ec{font-size:12px;color:var(--muted);margin-top:1px}
+.ealerta{margin-left:auto;background:#fef2f2;color:var(--rojo);font-size:11px;font-weight:700;padding:3px 8px;border-radius:6px;white-space:nowrap}
+.enums{display:grid;grid-template-columns:1fr 1fr 1fr 1fr}
+.enum{text-align:center;padding:11px 4px;border-right:1px solid var(--borde)}
+.enum:last-child{border-right:none}
+.enumv{font-family:'JetBrains Mono',monospace;font-size:18px;font-weight:700;color:var(--negro)}
+.enuml{font-size:9px;color:var(--muted);text-transform:uppercase;letter-spacing:.07em;margin-top:2px}
+
+/* PISTAS */
+.pista{background:var(--panel);border-radius:14px;border:1px solid var(--borde);padding:16px;margin-bottom:9px}
+
+/* BOTTOM SHEET */
+.sbg{position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:200;display:none;align-items:flex-end}
+.sbg.open{display:flex;animation:fadeIn .2s ease}
+.sheet{background:var(--panel);border-radius:20px 20px 0 0;width:100%;max-height:90vh;overflow-y:auto;overflow-x:hidden;animation:slideUp .3s cubic-bezier(.34,1.2,.64,1);padding-bottom:calc(env(safe-area-inset-bottom) + 8px)}
+.shandle{width:40px;height:4px;background:var(--borde);border-radius:2px;margin:12px auto 0}
+.shd{padding:15px 20px 13px;border-bottom:1px solid var(--borde)}
+.shn{font-size:19px;font-weight:800;color:var(--negro);line-height:1.2}
+.shc{font-size:13px;color:var(--muted);margin-top:3px}
+.setb{display:inline-flex;align-items:center;gap:6px;padding:5px 11px;border-radius:20px;font-size:12px;font-weight:700;margin-top:9px}
+.sbd{padding:15px 20px}
+.ichips{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:18px}
+.ic{background:var(--bg);border-radius:10px;padding:11px 13px}
+.icl{font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.1em;margin-bottom:3px}
+.icv{font-size:14px;font-weight:700;color:var(--negro)}
+.icf{grid-column:1/-1}
+.icf .icv{font-size:13px;font-weight:500;line-height:1.4}
+.ht{font-size:11px;font-weight:700;color:var(--negro);text-transform:uppercase;letter-spacing:.1em;margin-bottom:13px}
+.hi{display:flex;gap:11px;padding-bottom:15px;position:relative}
+.hi:not(:last-child)::before{content:'';position:absolute;left:18px;top:37px;width:1px;height:calc(100% - 15px);background:var(--borde)}
+.hico{width:36px;height:36px;background:var(--bg);border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:15px;flex-shrink:0;position:relative;z-index:1}
+.hcon{flex:1;padding-top:2px}
+.ha{font-size:13px;font-weight:700;color:var(--negro)}
+.hn{font-size:12px;color:var(--muted);margin-top:2px;line-height:1.4}
+.hf{font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--muted);margin-top:3px}
+.sft{display:flex;gap:9px;padding:11px 20px 15px;border-top:1px solid var(--borde)}
+.bwsp{flex:1;display:flex;align-items:center;justify-content:center;gap:7px;background:#25d366;color:#fff;border:none;border-radius:11px;padding:13px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit}
+.breg{flex:1;display:flex;align-items:center;justify-content:center;gap:7px;background:var(--negro);color:#fff;border:none;border-radius:11px;padding:13px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit}
+
+/* TOAST */
+.toast{position:fixed;bottom:calc(var(--tab) + 12px);left:13px;right:13px;background:var(--negro);color:#fff;padding:12px 15px;border-radius:12px;font-size:13px;font-weight:500;z-index:400;display:none;box-shadow:0 8px 32px rgba(0,0,0,.25);line-height:1.4}
+.toast.on{display:block;animation:slideUp .3s ease}
+.toast strong{color:#facc15}
+
+/* CHIP ESTADO */
+.chip-r{background:#fef2f2;color:var(--rojo);font-size:11px;font-weight:700;padding:3px 8px;border-radius:6px}
+.chip-v{background:#f0fdf4;color:var(--verde);font-size:11px;font-weight:700;padding:3px 8px;border-radius:6px}
+.chip-a{background:#fffbeb;color:var(--am);font-size:11px;font-weight:700;padding:3px 8px;border-radius:6px}
+
+/* DIVIDER */
+.div-line{height:1px;background:var(--borde);margin:12px 0}
+
+/* BANNER FLOTANTE CTA */
+.cta-float{
+  position:fixed;bottom:calc(var(--tab) + 12px);left:13px;right:13px;
+  background:var(--negro);border-radius:14px;
+  display:flex;align-items:center;gap:12px;
+  padding:14px 16px;
+  box-shadow:0 8px 32px rgba(0,0,0,.3);
+  z-index:80;
+  transform:translateY(120%);
+  transition:transform .4s cubic-bezier(.34,1.2,.64,1);
+}
+.cta-float.visible{transform:translateY(0)}
+.cta-float-txt{flex:1}
+.cta-float-titulo{font-size:13px;font-weight:700;color:#fff;line-height:1.3}
+.cta-float-sub{font-size:11px;color:rgba(255,255,255,.45);margin-top:2px}
+.cta-float-btn{background:#25d366;color:#fff;border:none;border-radius:10px;padding:10px 14px;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;white-space:nowrap;flex-shrink:0}
+.cta-float-cerrar{font-size:16px;color:rgba(255,255,255,.3);cursor:pointer;flex-shrink:0;background:none;border:none;padding:0;line-height:1}
+
+@keyframes fadeIn{from{opacity:0}to{opacity:1}}
+@keyframes slideUp{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}
+.vista{animation:slideUp .25s ease}
+
+::-webkit-scrollbar{width:4px;height:4px}
+::-webkit-scrollbar-thumb{background:var(--borde);border-radius:2px}
+</style>
+</head>
+<body>
+
+<div class="banner">DEMO · <span>ORDEN PPP</span> · Nueva Órbita</div>
+
+<!-- BANNER FLOTANTE -->
+<div class="cta-float" id="ctaFloat">
+  <div class="cta-float-txt">
+    <div class="cta-float-titulo">¿Esto es lo que necesita su equipo?</div>
+    <div class="cta-float-sub">Hablemos. Sin compromiso.</div>
+  </div>
+  <button class="cta-float-btn" onclick="window.open('https://wa.me/593XXXXXXXXX?text=Vi%20el%20demo%20de%20ORDEN%20PPP%20y%20quiero%20saber%20m%C3%A1s','_blank')">💬 Hablemos</button>
+  <button class="cta-float-cerrar" onclick="cerrarFloat()" title="Cerrar">✕</button>
+</div>
+
+<div class="topbar">
+  <div class="tlogo">ORDEN PPP</div>
+  <button class="ibtn" onclick="showToast('3 seguimientos vencidos · 2 clientes en peligro de deserción')">
+    🔔<span class="ndot"></span>
+  </button>
+  <div class="tavatar">AL</div>
+</div>
+
+<div class="sa" id="sa"></div>
+
+<nav class="tabs" id="tabs">
+  <div class="tline" id="tl"></div>
+  <button class="tab activo" data-v="dashboard" onclick="nav('dashboard',this)"><span class="ticon">◉</span><span class="tlbl">Inicio</span></button>
+  <button class="tab" data-v="pipeline" onclick="nav('pipeline',this)"><span class="ticon">⊞</span><span class="tlbl">Pipeline</span></button>
+  <button class="tab" data-v="equipo" onclick="nav('equipo',this)"><span class="ticon">◈</span><span class="tlbl">Equipo</span></button>
+  <button class="tab" data-v="pistas" onclick="nav('pistas',this)"><span class="ticon">◇</span><span class="tlbl">Pistas</span></button>
+  <button class="tab" data-v="contratar" onclick="nav('contratar',this)"><span class="ticon">💼</span><span class="tlbl">Contratar</span></button>
+</nav>
+
+<div class="sbg" id="sbg" onclick="closeSheet(event)">
+  <div class="sheet" id="sheet"></div>
+</div>
+<div class="toast" id="toast"></div>
+
+<script>
+// ════════════════════════════════
+// DATA
+// ════════════════════════════════
+const ET=[
+  {id:'contacto',     n:'Contacto',    c:'#64748b'},
+  {id:'presentacion', n:'Presentación',c:'#2563eb'},
+  {id:'propuesta',    n:'Propuesta',   c:'#7c3aed'},
+  {id:'negociacion',  n:'Negociación', c:'#d97706'},
+  {id:'cierre',       n:'Cierre',      c:'#16a34a'},
+];
+
+const VE=[
+  {id:1,n:'Carlos Mendoza', cargo:'Agente Senior',  ini:'CM',c:'#2563eb',p:18,sh:4,ci:3,m:8, ci6:[2,3,4,3,5,3], comision:2840, cartera:42000},
+  {id:2,n:'Patricia Vega',  cargo:'Agente',         ini:'PV',c:'#7c3aed',p:12,sh:2,ci:2,m:8, ci6:[1,2,2,3,2,2], comision:1920, cartera:28500},
+  {id:3,n:'Roberto Iza',    cargo:'Agente',         ini:'RI',c:'#059669',p:9, sh:5,ci:1,m:8, ci6:[0,1,1,2,1,1], comision:890,  cartera:18200},
+  {id:4,n:'Diana Mora',     cargo:'Agente Junior',  ini:'DM',c:'#d97706',p:7, sh:1,ci:0,m:8, ci6:[0,0,1,0,0,0], comision:0,    cartera:6400},
+];
+
+const MESES=['Nov','Dic','Ene','Feb','Mar','Abr'];
+const CIERRES_MES=[14,18,12,16,20,6]; // Abr parcial
+const META_MES=20;
+
+const PRODUCTOS=[
+  {n:'Seguro Vehicular',     ventas:28,val:32400, margen:38},
+  {n:'Seguro de Salud Gral.',ventas:19,val:54800, margen:51},
+  {n:'Seguro de Vida',       ventas:14,val:38200, margen:44},
+  {n:'Seguro de Mercadería', ventas:9, val:18600, margen:29},
+  {n:'Resp. Civil Empresas', ventas:6, val:41000, margen:62},
+];
+
+const PR=[
+  {id:1, n:'Petromax S.A.',           ct:'Ing. Ramírez',    e:'contacto',     v:1,val:1200, valf:'$1,200/año',f:'Hace 3 días',st:'vencida',nota:'Flota de 8 vehículos. Muy interesado en cobertura total.',prod:'Seguro Vehicular'},
+  {id:2, n:'Clínica San Andrés',      ct:'Dra. Flores',     e:'contacto',     v:2,val:2400, valf:'$2,400/año',f:'Hoy',        st:'hoy',    nota:'Seguro salud grupal para 22 empleados. Quieren cotización.',prod:'Seguro de Salud Gral.'},
+  {id:3, n:'Constructora Valensi',    ct:'Sr. Valenzuela',  e:'presentacion', v:1,val:3600, valf:'$3,600/año',f:'Mañana',     st:'ok',     nota:'Presentación hecha el martes. Espera cotización detallada.',prod:'Resp. Civil Empresas'},
+  {id:4, n:'Importadora Díaz',        ct:'Sra. Díaz',       e:'presentacion', v:3,val:900,  valf:'$900/año',  f:'Hace 5 días',st:'vencida',nota:'Seguro de mercadería en tránsito. Muy interesada.',prod:'Seguro de Mercadería'},
+  {id:5, n:'Hotel Presidente',        ct:'Gte. Acosta',     e:'propuesta',    v:1,val:4800, valf:'$4,800/año',f:'Hoy',        st:'hoy',    nota:'Propuesta enviada el lunes. Pide descuento por 2 años.',prod:'Resp. Civil Empresas'},
+  {id:6, n:'Distribuidora Norteña',   ct:'Sr. Correa',      e:'propuesta',    v:2,val:1800, valf:'$1,800/año',f:'2 días',     st:'ok',     nota:'Comparando con otra aseguradora. Necesita seguimiento.',prod:'Seguro de Mercadería'},
+  {id:7, n:'Farmacia Salud Total',    ct:'Sra. Romo',       e:'negociacion',  v:3,val:2100, valf:'$2,100/año',f:'Mañana',     st:'ok',     nota:'Acepta precio pero pide incluir seguro de equipos.',prod:'Seguro de Salud Gral.'},
+  {id:8, n:'Taller Automotriz Paz',   ct:'Sr. Paz',         e:'negociacion',  v:1,val:750,  valf:'$750/año',  f:'Hoy',        st:'hoy',    nota:'Lista para firmar si hay facilidades de pago.',prod:'Seguro Vehicular'},
+  {id:9, n:'Colegio Nuevo Horizonte', ct:'Rector Molina',   e:'cierre',       v:2,val:5200, valf:'$5,200/año',f:'✓ Cerrado', st:'ok',     nota:'CERRADO ✓ Firmado el viernes. Primer pago recibido.',prod:'Resp. Civil Empresas'},
+  {id:10,n:'LogiCarga Express',       ct:'Ing. Torres',     e:'contacto',     v:4,val:1600, valf:'$1,600/año',f:'Ayer',       st:'ok',     nota:'Referido por Petromax. Primera llamada pendiente.',prod:'Seguro Vehicular'},
+  {id:11,n:'Restaurante El Marino',   ct:'Chef Bustamante', e:'presentacion', v:4,val:600,  valf:'$600/año',  f:'3 días',     st:'ok',     nota:'Puede traer referidos del sector gastronómico.',prod:'Seguro de Mercadería'},
+  {id:12,n:'Banco Popular Coop.',     ct:'Subger. Aguilar', e:'propuesta',    v:3,val:8400, valf:'$8,400/año',f:'Hace 2 días',st:'vencida',nota:'Cuenta grande. Requiere propuesta personalizada urgente.',prod:'Resp. Civil Empresas'},
+  {id:13,n:'Grupo Familiar Salgado',  ct:'Sr. Salgado',     e:'contacto',     v:2,val:480,  valf:'$480/año',  f:'Hoy',        st:'hoy',    nota:'Familia interesada en seguro de vida + salud.',prod:'Seguro de Vida'},
+  {id:14,n:'Tecnicentro Automotriz',  ct:'Ing. Bravo',      e:'presentacion', v:1,val:2200, valf:'$2,200/año',f:'Hace 1 día', st:'ok',     nota:'Ampliar cobertura de flota propia.',prod:'Seguro Vehicular'},
+];
+
+const CARTERA_ACTIVA=[
+  {n:'Petroecuador Ltda.',    prod:'Seguro Vehicular',    venc:'Jul 2025', monto:3200, riesgo:'alto',    motivo:'Sin respuesta hace 45 días'},
+  {n:'Multitiendas Guayas',   prod:'Seguro de Mercadería',venc:'May 2025', monto:1800, riesgo:'alto',    motivo:'Pidió comparativo con competencia'},
+  {n:'Farmacia La Cruz',      prod:'Seguro de Salud',     venc:'Jun 2025', monto:2400, riesgo:'medio',   motivo:'Cambio de gerente, relación en riesgo'},
+  {n:'Trans. Rápido S.A.',    prod:'Resp. Civil Emp.',    venc:'Ago 2025', monto:4100, riesgo:'bajo',    motivo:'Renovación probable, seguimiento normal'},
+  {n:'Inversiones Montoya',   prod:'Seguro de Vida',      venc:'Sep 2025', monto:960,  riesgo:'bajo',    motivo:'Cliente satisfecho, renovación esperada'},
+];
+
+const HIST={
+  1:[{i:'📞',a:'Llamada realizada',n:'Confirmó interés en flota. Pide cotización formal.',f:'Hace 3 días'},{i:'📧',a:'Correo enviado',n:'Presentación de coberturas vehiculares.',f:'Hace 5 días'},{i:'➕',a:'Prospecto creado',n:'Contacto en feria automotriz.',f:'Hace 7 días'}],
+  5:[{i:'📄',a:'Propuesta enviada',n:'PDF con 3 opciones. Valor anual $4,800.',f:'Hace 3 días'},{i:'🤝',a:'Reunión presencial',n:'Visita al hotel. Muy interesado. Pide descuento.',f:'Hace 6 días'},{i:'📞',a:'Primera llamada',n:'Referido por Carlos Acosta. Muy receptivo.',f:'Hace 10 días'}],
+  12:[{i:'📄',a:'Propuesta enviada',n:'Propuesta inicial $8,400 anuales. En revisión por gerencia.',f:'Hace 2 días'},{i:'🤝',a:'Reunión en sede',n:'Subgerente muy interesado. Escala a dirección.',f:'Hace 5 días'},{i:'📞',a:'Contacto inicial',n:'Llamada en frío. Receptivo. Cita agendada.',f:'Hace 9 días'}],
+};
+
+// ════════════════════════════════
+// NAVEGACIÓN
+// ════════════════════════════════
+let etapaA='contacto';
+
+function nav(v,el){
+  document.querySelectorAll('.tab').forEach(t=>t.classList.remove('activo'));
+  el.classList.add('activo');
+  moveLine(el);
+  const sa=document.getElementById('sa');
+  sa.scrollTop=0;
+  const d=document.createElement('div');
+  d.className='vista';
+  const map={dashboard:rDash,pipeline:rPipeline,equipo:rEquipo,mios:rMios,pistas:rPistas,contratar:rContratar};
+  d.innerHTML=(map[v]||rDash)();
+  sa.innerHTML='';sa.appendChild(d);
+}
+
+function moveLine(el){
+  const tabs=document.getElementById('tabs');
+  const line=document.getElementById('tl');
+  const r=el.getBoundingClientRect(),tr=tabs.getBoundingClientRect();
+  line.style.left=(r.left-tr.left+r.width/2-14)+'px';
+}
+
+// ════════════════════════════════
+// DASHBOARD
+// ════════════════════════════════
+function rDash(){
+  const urg=PR.filter(p=>p.st==='vencida').length;
+  const hoy=PR.filter(p=>p.st==='hoy').length;
+  const totalCierresAct=6; // Abr parcial
+  const pctMeta=Math.round(totalCierresAct/META_MES*100);
+  const diasMes=30,diaActual=15,diasRest=diasMes-diaActual;
+  const proyeccion=Math.round(totalCierresAct/diaActual*diasMes);
+  const enPropNeg=PR.filter(p=>p.e==='propuesta'||p.e==='negociacion');
+  const valorPropNeg=enPropNeg.reduce((s,p)=>s+p.val,0);
+  const valorProspeccion=PR.filter(p=>p.e==='contacto'||p.e==='presentacion').reduce((s,p)=>s+p.val,0);
+  const clientesRiesgo=CARTERA_ACTIVA.filter(c=>c.riesgo==='alto').length;
+  const mesAnt=CIERRES_MES[4]; // Mar=20
+  const diffMes=totalCierresAct-Math.round(mesAnt/2); // comparar mitad de mes anterior
+  const topVend=VE.reduce((a,b)=>b.ci>a.ci?b:a);
+  const rezVend=VE.reduce((a,b)=>b.ci<a.ci?b:a);
+  const prodRot=PRODUCTOS.reduce((a,b)=>b.ventas>a.ventas?b:a);
+  const prodRent=PRODUCTOS.reduce((a,b)=>b.margen>a.margen?b:a);
+  const inventActual=PR.length;
+  const tasaCierre=0.28; // histórico: 28% de prospectos cierran
+  const diasEstimado=Math.round(inventActual/tasaCierre * (30/totalCierresAct||30));
+
+  // historico 6 meses acumulado por vendedor
+  const mejor6=VE.map(v=>({...v,total6:v.ci6.reduce((a,b)=>a+b,0)})).reduce((a,b)=>b.total6>a.total6?b:a);
+
+  return `
+<!-- BIENVENIDA -->
+<div style="margin-bottom:12px">
+  <div style="font-size:12px;color:var(--muted);margin-bottom:1px">Buenos días 👋</div>
+  <div style="font-size:20px;font-weight:800;color:var(--negro)">Alejandro Lagos</div>
+  <div style="font-size:11px;color:var(--muted);margin-top:2px">Abril 2025 · Día 15 de 30</div>
+</div>
+
+<!-- ALERTAS -->
+${clientesRiesgo>0?`<div class="alert alert-r"><span class="alert-ico">🚨</span><div class="alert-txt"><strong>${clientesRiesgo} clientes en peligro de deserción</strong>Multitiendas Guayas y Petroecuador sin contacto &gt;45 días.</div></div>`:''}
+${urg>0?`<div class="alert alert-a"><span class="alert-ico">⚠️</span><div class="alert-txt"><strong>${urg} seguimientos vencidos</strong>Banco Popular Coop. lleva 2 días sin respuesta a propuesta de $8,400.</div></div>`:''}
+<div class="alert alert-v"><span class="alert-ico">🏆</span><div class="alert-txt"><strong>Colegio Nuevo Horizonte cerrado — $5,200/año</strong>Patricia Vega. Primer pago recibido el viernes.</div></div>
+
+<!-- KPIs META MES -->
+<div class="sl">Meta del mes</div>
+<div class="card">
+  <div class="card-b" style="padding:16px">
+    <div style="display:flex;align-items:flex-end;justify-content:space-between;margin-bottom:8px">
+      <div>
+        <div style="font-size:32px;font-weight:800;color:var(--negro);font-family:'JetBrains Mono',monospace;line-height:1">${totalCierresAct}<span style="font-size:16px;color:var(--muted);font-weight:500"> / ${META_MES}</span></div>
+        <div style="font-size:12px;color:var(--muted);margin-top:3px">cierres este mes</div>
+      </div>
+      <div style="text-align:right">
+        <div style="font-size:22px;font-weight:800;color:${pctMeta>=50?'var(--verde)':'var(--am)'};font-family:'JetBrains Mono',monospace">${pctMeta}%</div>
+        <div style="font-size:11px;color:var(--muted)">al día 15</div>
+      </div>
+    </div>
+    <div class="btrack"><div class="bfill" style="width:${pctMeta}%;background:${pctMeta>=75?'var(--verde)':pctMeta>=40?'var(--am)':'var(--rojo)'}"></div></div>
+    <div style="display:flex;justify-content:space-between;margin-top:10px">
+      <div style="font-size:12px;color:var(--muted)">🔮 Proyección fin de mes: <strong style="color:${proyeccion>=META_MES?'var(--verde)':'var(--am)'}"> ${proyeccion} cierres</strong></div>
+      <div style="font-size:11px;color:var(--muted)">${diasRest} días restantes</div>
+    </div>
+  </div>
+</div>
+
+<!-- KPIs PRINCIPALES -->
+<div class="sl">Indicadores clave</div>
+<div class="kgrid">
+  <div class="kpi"><div class="kpi-s" style="background:var(--azul)"></div><div class="kpi-n">${PR.length}</div><div class="kpi-l">Prospectos activos</div><div class="kpi-sub">${PR.length>12?'↑':'↓'} vs mes ant.</div></div>
+  <div class="kpi"><div class="kpi-s" style="background:var(--rojo)"></div><div class="kpi-n" style="color:var(--rojo)">${urg}</div><div class="kpi-l">Seguim. vencidos</div><div class="kpi-sub">Acción urgente</div></div>
+  <div class="kpi"><div class="kpi-s" style="background:var(--morado)"></div><div class="kpi-n" style="font-size:22px">$${(valorPropNeg/1000).toFixed(1)}k</div><div class="kpi-l">En negociación</div><div class="kpi-sub">Propuesta + Neg.</div></div>
+  <div class="kpi"><div class="kpi-s" style="background:var(--verde)"></div><div class="kpi-n" style="font-size:22px">$${(valorProspeccion/1000).toFixed(1)}k</div><div class="kpi-l">En prospección</div><div class="kpi-sub">Contacto + Present.</div></div>
+</div>
+
+<!-- COMPARATIVO MESES -->
+<div class="sl">Cierres últimos 6 meses <span class="sv" onclick="openChartSheet()">Detalle</span></div>
+<div class="card">
+  <div class="card-b" style="padding:16px 14px 10px">
+    <div class="bars" id="barsChart">
+      ${MESES.map((m,i)=>{
+        const v=CIERRES_MES[i];
+        const maxV=Math.max(...CIERRES_MES);
+        const h=Math.round((v/maxV)*52)+8;
+        const isLast=i===MESES.length-1;
+        return `<div class="bar-col">
+          <div class="bar-fill" style="height:${h}px;background:${isLast?'var(--am)':i===4?'var(--verde)':'var(--borde)'};width:100%"></div>
+          <div class="bar-lbl">${m}</div>
+        </div>`;
+      }).join('')}
+    </div>
+    <div style="display:flex;justify-content:space-between;margin-top:10px;padding:0 2px">
+      <div style="font-size:11px;color:var(--muted)">Mar (mejor): <strong style="color:var(--verde)">${CIERRES_MES[4]} cierres</strong></div>
+      <div style="font-size:11px;color:var(--muted)">Abr en curso: <strong style="color:var(--am)">${CIERRES_MES[5]}</strong></div>
+    </div>
+    <div style="font-size:11px;color:var(--muted);margin-top:4px;padding:0 2px">Promedio 5M: <strong>${Math.round(CIERRES_MES.slice(0,5).reduce((a,b)=>a+b,0)/5)} cierres/mes</strong></div>
+  </div>
+</div>
+
+<!-- INVENTARIO & PROYECCIÓN -->
+<div class="sl">Inventario de cartera</div>
+<div class="kgrid3">
+  <div class="kpi kpi-small"><div class="kpi-s" style="background:var(--azul)"></div><div class="kpi-n">${inventActual}</div><div class="kpi-l">Prospectos</div></div>
+  <div class="kpi kpi-small"><div class="kpi-s" style="background:var(--am)"></div><div class="kpi-n">${diasEstimado}</div><div class="kpi-l">Días est.</div></div>
+  <div class="kpi kpi-small"><div class="kpi-s" style="background:var(--verde)"></div><div class="kpi-n">${Math.round(tasaCierre*100)}%</div><div class="kpi-l">T. cierre</div></div>
+</div>
+<div style="font-size:11px;color:var(--muted);padding:0 2px;margin-top:4px;margin-bottom:4px">Al ritmo actual, este inventario dura ~${diasEstimado} días. ${diasEstimado<30?'⚠️ Necesita más prospectos.':'✅ Inventario saludable.'}</div>
+
+<!-- PRODUCTOS -->
+<div class="sl">Productos</div>
+<div class="card">
+  <div class="card-h"><div class="card-t">🔄 Mayor rotación</div><div class="card-m">${prodRot.ventas} ventas</div></div>
+  <div class="card-b" style="padding:12px 16px">
+    <div style="font-size:15px;font-weight:800;color:var(--negro)">${prodRot.n}</div>
+    <div style="font-size:12px;color:var(--muted);margin-top:2px">$${prodRot.val.toLocaleString()} en primas · ${prodRot.margen}% margen</div>
+    <div class="btrack" style="margin-top:8px"><div class="bfill" style="width:${Math.round(prodRot.ventas/PRODUCTOS.reduce((a,b)=>a+b.ventas,0)*100)}%;background:var(--azul)"></div></div>
+  </div>
+  <div class="card-h" style="border-top:1px solid var(--borde)"><div class="card-t">💰 Más rentable</div><div class="card-m">${prodRent.margen}% margen</div></div>
+  <div class="card-b" style="padding:12px 16px">
+    <div style="font-size:15px;font-weight:800;color:var(--negro)">${prodRent.n}</div>
+    <div style="font-size:12px;color:var(--muted);margin-top:2px">$${prodRent.val.toLocaleString()} en primas · ${prodRent.ventas} ventas</div>
+    <div class="btrack" style="margin-top:8px"><div class="bfill" style="width:${prodRent.margen}%;background:var(--verde)"></div></div>
+  </div>
+</div>
+
+<!-- VENDEDORES TOP / REZAGADO -->
+<div class="sl">Equipo este mes</div>
+<div class="kgrid">
+  <div class="card" style="margin-bottom:0">
+    <div class="card-b" style="padding:14px">
+      <div style="font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.08em;margin-bottom:8px">🏆 Top del mes</div>
+      <div style="display:flex;align-items:center;gap:10px">
+        <div style="width:36px;height:36px;border-radius:9px;background:${topVend.c};display:flex;align-items:center;justify-content:center;color:#fff;font-weight:800;font-size:13px">${topVend.ini}</div>
+        <div><div style="font-weight:700;font-size:13px;color:var(--negro)">${topVend.n.split(' ')[0]}</div><div style="font-size:20px;font-weight:800;color:var(--verde);font-family:'JetBrains Mono',monospace">${topVend.ci}/${topVend.m}</div></div>
+      </div>
+    </div>
+  </div>
+  <div class="card" style="margin-bottom:0">
+    <div class="card-b" style="padding:14px">
+      <div style="font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.08em;margin-bottom:8px">📉 Rezagado</div>
+      <div style="display:flex;align-items:center;gap:10px">
+        <div style="width:36px;height:36px;border-radius:9px;background:${rezVend.c};display:flex;align-items:center;justify-content:center;color:#fff;font-weight:800;font-size:13px">${rezVend.ini}</div>
+        <div><div style="font-weight:700;font-size:13px;color:var(--negro)">${rezVend.n.split(' ')[0]}</div><div style="font-size:20px;font-weight:800;color:var(--rojo);font-family:'JetBrains Mono',monospace">${rezVend.ci}/${rezVend.m}</div></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- MEJOR 6 MESES -->
+<div style="margin-top:10px">
+<div class="card">
+  <div class="card-h"><div class="card-t">📊 Mejor vendedor últimos 6M</div></div>
+  <div class="card-b" style="padding:14px 16px">
+    <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px">
+      <div style="width:38px;height:38px;border-radius:10px;background:${mejor6.c};display:flex;align-items:center;justify-content:center;color:#fff;font-weight:800;font-size:13px">${mejor6.ini}</div>
+      <div><div style="font-weight:700;font-size:14px;color:var(--negro)">${mejor6.n}</div><div style="font-size:12px;color:var(--muted)">${mejor6.total6} cierres acumulados</div></div>
+      <span class="chip-v" style="margin-left:auto">#1</span>
+    </div>
+    <div class="bars" style="height:50px">
+      ${MESES.map((m,i)=>{
+        const v=mejor6.ci6[i];
+        const maxV=Math.max(...mejor6.ci6,1);
+        const h=Math.round((v/maxV)*42)+5;
+        return `<div class="bar-col"><div class="bar-fill" style="height:${h}px;background:${mejor6.c};opacity:${i===MESES.length-1?0.5:1}"></div><div class="bar-lbl">${m}</div></div>`;
+      }).join('')}
+    </div>
+  </div>
+</div>
+</div>
+
+<!-- CLIENTES EN PELIGRO -->
+<div class="sl">Salud de cartera <span class="badge badge-a">${clientesRiesgo} riesgo alto</span></div>
+${CARTERA_ACTIVA.map(c=>`
+<div class="card" style="margin-bottom:8px" onclick="showToast('En la app real verías el historial completo de ${c.n} y podrías asignar un plan de retención.')">
+  <div class="card-b" style="padding:13px 16px;display:flex;align-items:flex-start;gap:10px">
+    <div style="flex:1">
+      <div style="font-size:13px;font-weight:700;color:var(--negro)">${c.n}</div>
+      <div style="font-size:11px;color:var(--muted);margin-top:2px">${c.prod} · Vence ${c.venc}</div>
+      <div style="font-size:11px;color:var(--muted);margin-top:3px;font-style:italic">${c.motivo}</div>
+    </div>
+    <div style="text-align:right;flex-shrink:0">
+      <div style="font-family:'JetBrains Mono',monospace;font-size:13px;font-weight:600;color:var(--verde)">$${c.monto.toLocaleString()}</div>
+      <span class="${c.riesgo==='alto'?'chip-r':c.riesgo==='medio'?'chip-a':'chip-v'}" style="margin-top:5px;display:inline-block">${c.riesgo==='alto'?'Alto riesgo':c.riesgo==='medio'?'Vigilar':'OK'}</span>
+    </div>
+  </div>
+</div>`).join('')}
+
+<!-- URGENTES PIPELINE -->
+<div class="sl">⚠️ Seguimientos urgentes <span class="badge">${urg+hoy}</span></div>
+<div class="card">
+${PR.filter(p=>p.st==='vencida'||p.st==='hoy').slice(0,5).map(p=>{
+  const et=ET.find(x=>x.id===p.e);
+  const vd=VE.find(x=>x.id===p.v);
+  return`<div class="prow" onclick="openSheet(${p.id})">
+    <div class="pdot" style="background:${p.st==='vencida'?'var(--rojo)':'var(--am)'}"></div>
+    <div class="pinfo"><div class="pn">${p.n}</div><div class="ps">${vd?.n.split(' ')[0]} · ${et?.n}</div></div>
+    <div class="pright"><div class="pf" style="color:${p.st==='vencida'?'var(--rojo)':'var(--am)'}">${p.f}</div><div class="pv">${p.valf}</div></div>
+  </div>`;}).join('')}
+</div>
+
+<!-- TABLA PRODUCTOS -->
+<div class="sl">Tabla de productos del mes</div>
+<div class="card">
+  <div style="overflow-x:auto">
+    <table class="tabla" style="min-width:380px">
+      <thead><tr><th>Producto</th><th style="text-align:right">Ventas</th><th style="text-align:right">Primas</th><th style="text-align:right">Margen</th></tr></thead>
+      <tbody>
+        ${PRODUCTOS.sort((a,b)=>b.val-a.val).map(p=>`
+        <tr onclick="showToast('${p.n}: ${p.ventas} ventas este mes, $${p.val.toLocaleString()} en primas.')">
+          <td style="font-weight:600">${p.n}</td>
+          <td style="text-align:right;font-family:'JetBrains Mono',monospace">${p.ventas}</td>
+          <td style="text-align:right;font-family:'JetBrains Mono',monospace;color:var(--verde)">$${p.val.toLocaleString()}</td>
+          <td style="text-align:right"><span class="${p.margen>=50?'chip-v':p.margen>=35?'chip-a':'chip-r'}">${p.margen}%</span></td>
+        </tr>`).join('')}
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<!-- ACUMULADO EQUIPO -->
+<div class="sl">Acumulado del mes por vendedor</div>
+<div class="card">
+  ${VE.map(v=>`
+  <div style="padding:13px 16px;border-bottom:1px solid var(--borde);cursor:pointer" onclick="showToast('${v.n}: $${v.comision.toLocaleString()} en comisiones este mes.')" >
+    <div style="display:flex;align-items:center;gap:10px;margin-bottom:8px">
+      <div style="width:32px;height:32px;border-radius:8px;background:${v.c};display:flex;align-items:center;justify-content:center;font-weight:800;font-size:11px;color:#fff">${v.ini}</div>
+      <div style="flex:1"><div style="font-size:13px;font-weight:700;color:var(--negro)">${v.n}</div></div>
+      <div style="font-family:'JetBrains Mono',monospace;font-size:13px;font-weight:600;color:var(--verde)">$${v.comision.toLocaleString()}</div>
+      <div style="font-family:'JetBrains Mono',monospace;font-size:14px;font-weight:700;color:${v.ci>=v.m*0.5?'var(--verde)':'var(--rojo)'}">${v.ci}/${v.m}</div>
+    </div>
+    <div class="btrack"><div class="bfill" style="width:${Math.round(v.ci/v.m*100)}%;background:${v.c}"></div></div>
+  </div>`).join('')}
+  <div style="padding:12px 16px;background:var(--bg)">
+    <div style="display:flex;justify-content:space-between;align-items:center">
+      <div style="font-size:12px;font-weight:700;color:var(--negro)">Total equipo</div>
+      <div style="font-family:'JetBrains Mono',monospace;font-size:14px;font-weight:800;color:var(--negro)">$${VE.reduce((s,v)=>s+v.comision,0).toLocaleString()}</div>
+    </div>
+  </div>
+</div>
+`;
+}
+
+// ════════════════════════════════
+// PIPELINE
+// ════════════════════════════════
+function rPipeline(){
+  return`
+<div class="esc" id="esc">
+${ET.map(et=>`<div class="echip ${et.id===etapaA?'activo':''}" onclick="chEtapa('${et.id}')"><span class="ecdot" style="background:${et.c}"></span>${et.n} (${PR.filter(p=>p.e===et.id).length})</div>`).join('')}
+</div>
+<div id="pcards">${pCards(etapaA)}</div>`;
+}
+
+function pCards(eid){
+  const cols=PR.filter(p=>p.e===eid);
+  if(!cols.length) return`<div style="text-align:center;padding:40px 16px;color:var(--muted)">Sin prospectos en esta etapa</div>`;
+  return cols.map(p=>{
+    const v=VE.find(x=>x.id===p.v);
+    return`<div class="pcf" onclick="openSheet(${p.id})">
+${p.st==='vencida'?`<div class="pcf-stripe" style="background:var(--rojo)"></div>`:''}
+${p.st==='hoy'?`<div class="pcf-stripe" style="background:var(--am)"></div>`:''}
+<div class="pcf-top"><div><div class="pcf-n">${p.n}</div><div class="pcf-c">${p.ct}</div></div><div class="pcf-val">${p.valf}</div></div>
+<div class="pcf-foot"><span class="pcf-vt">${v?.ini} · ${v?.n.split(' ')[0]}</span><span class="pcf-fecha" style="color:${p.st==='vencida'?'var(--rojo)':p.st==='hoy'?'var(--am)':'var(--muted)'}">${p.f}</span></div>
+</div>`;
+  }).join('');
+}
+
+function chEtapa(id){
+  etapaA=id;
+  document.querySelectorAll('.echip').forEach(c=>{
+    const et=ET.find(e=>e.id===id);
+    c.classList.toggle('activo',c.textContent.trim().startsWith(et.n));
+  });
+  document.getElementById('pcards').innerHTML=pCards(id);
+}
+
+// ════════════════════════════════
+// EQUIPO
+// ════════════════════════════════
+function rEquipo(){
+  return`
+<div class="sl" style="margin-top:0">Rendimiento individual</div>
+${VE.map(v=>{
+  const venc=PR.filter(p=>p.v===v.id&&p.st==='vencida').length;
+  const total6=v.ci6.reduce((a,b)=>a+b,0);
+  return`<div class="ecard" onclick="showToast('Aquí verías todos los prospectos e historial completo de ${v.n}. Cartera activa: $${v.cartera.toLocaleString()}')">
+<div class="etop">
+  <div class="eav" style="background:${v.c}">${v.ini}</div>
+  <div><div class="en">${v.n}</div><div class="ec">${v.cargo}</div></div>
+  ${venc?`<div class="ealerta">${venc} venc.</div>`:''}
+</div>
+<div class="enums">
+  <div class="enum"><div class="enumv">${v.p}</div><div class="enuml">Prosp.</div></div>
+  <div class="enum"><div class="enumv" style="color:var(--rojo)">${v.sh}</div><div class="enuml">Seguim.</div></div>
+  <div class="enum"><div class="enumv" style="color:var(--verde)">${v.ci}/${v.m}</div><div class="enuml">Cierres</div></div>
+  <div class="enum"><div class="enumv" style="color:var(--morado)">${total6}</div><div class="enuml">6 meses</div></div>
+</div>
+<div style="padding:10px 16px;background:var(--bg);display:flex;justify-content:space-between;align-items:center">
+  <div style="font-size:11px;color:var(--muted)">Cartera activa</div>
+  <div style="font-family:'JetBrains Mono',monospace;font-size:12px;font-weight:700;color:var(--negro)">$${v.cartera.toLocaleString()}</div>
+</div>
+</div>`;
+}).join('')}
+<div class="sl">Tabla comparativa 6 meses</div>
+<div class="card">
+  <div style="overflow-x:auto">
+    <table class="tabla" style="min-width:360px">
+      <thead><tr><th>Vendedor</th>${MESES.map(m=>`<th style="text-align:center">${m}</th>`).join('')}<th style="text-align:right">Total</th></tr></thead>
+      <tbody>
+        ${VE.map(v=>{
+          const t=v.ci6.reduce((a,b)=>a+b,0);
+          return`<tr>
+            <td style="font-weight:700">${v.n.split(' ')[0]}</td>
+            ${v.ci6.map((c,i)=>`<td style="text-align:center;font-family:'JetBrains Mono',monospace;color:${c===0?'var(--muted)':c>=4?'var(--verde)':'var(--texto)'}">${c}</td>`).join('')}
+            <td style="text-align:right;font-family:'JetBrains Mono',monospace;font-weight:700;color:var(--negro)">${t}</td>
+          </tr>`;
+        }).join('')}
+      </tbody>
+    </table>
+  </div>
+</div>`;
+}
+
+// ════════════════════════════════
+// MIS PROSPECTOS
+// ════════════════════════════════
+function rMios(){
+  const mios=PR.filter(p=>p.v===1);
+  return`
+<div style="font-size:12px;color:var(--muted);margin-bottom:12px">Vista del vendedor — lo que Carlos ve en su celular</div>
+${mios.map(p=>{const et=ET.find(x=>x.id===p.e);return`
+<div class="pcf" onclick="openSheet(${p.id})">
+${p.st==='vencida'?`<div class="pcf-stripe" style="background:var(--rojo)"></div>`:''}
+${p.st==='hoy'?`<div class="pcf-stripe" style="background:var(--am)"></div>`:''}
+<div class="pcf-top"><div><div class="pcf-n">${p.n}</div><div class="pcf-c">${p.ct}</div></div><div class="pcf-val">${p.valf}</div></div>
+<div class="pcf-foot"><span style="display:inline-flex;align-items:center;gap:5px;background:${et?.c}18;color:${et?.c};font-size:11px;font-weight:700;padding:3px 8px;border-radius:6px"><span style="width:6px;height:6px;border-radius:50%;background:${et?.c};display:inline-block"></span>${et?.n}</span><span class="pcf-fecha" style="color:${p.st==='vencida'?'var(--rojo)':p.st==='hoy'?'var(--am)':'var(--muted)'}">${p.f}</span></div>
+</div>`}).join('')}`;
+}
+
+// ════════════════════════════════
+// PISTAS
+// ════════════════════════════════
+function rPistas(){
+  return[
+    {e:'🏢',t:'Constructoras en expansión',d:'3 empresas en Guayaquil Norte amplían planilla. Alta probabilidad de necesitar seguro grupal antes de junio.',tag:'Alta oportunidad'},
+    {e:'🚗',t:'Renovaciones de flota',d:'Petromax y LogiCarga tienen vencimientos de pólizas vehiculares en los próximos 30 días.',tag:'Urgente'},
+    {e:'💊',t:'Clínicas en crecimiento',d:'San Andrés abre nueva sede en Samborondón. Oportunidad de ampliar cobertura existente.',tag:'Referido activo'},
+    {e:'🎓',t:'Temporada escolar',d:'Colegios privados renuevan seguros en mayo. 8 instituciones sin cobertura en zona norte.',tag:'Temporada'},
+    {e:'🏨',t:'Sector hotelero activo',d:'Hotel Presidente podría referir a 4 hoteles del mismo grupo. Pedir referidos en el cierre.',tag:'Referido potencial'},
+  ].map(p=>`<div class="pista"><span style="font-size:26px;margin-bottom:10px;display:block">${p.e}</span><div style="font-size:14px;font-weight:800;color:var(--negro);margin-bottom:6px">${p.t}</div><div style="font-size:13px;color:var(--muted);line-height:1.5;margin-bottom:12px">${p.d}</div><span style="display:inline-flex;align-items:center;padding:4px 10px;border-radius:20px;font-size:11px;font-weight:700;background:#eff6ff;color:var(--azul)">${p.tag}</span></div>`).join('');
+}
+
+// ════════════════════════════════
+// SHEET
+// ════════════════════════════════
+function openSheet(id){
+  const p=PR.find(x=>x.id===id);if(!p)return;
+  const v=VE.find(x=>x.id===p.v);
+  const et=ET.find(x=>x.id===p.e);
+  const hist=HIST[id]||[{i:'📞',a:'Llamada de seguimiento',n:'Confirmó interés. Solicita propuesta.',f:'Ayer'},{i:'➕',a:'Prospecto creado',n:'Ingresado por '+v?.n,f:'Hace 5 días'}];
+  document.getElementById('sheet').innerHTML=`
+<div class="shandle"></div>
+<div class="shd">
+  <div class="shn">${p.n}</div>
+  <div class="shc">${p.ct} · ${v?.n}</div>
+  <div class="setb" style="background:${et?.c}18;color:${et?.c}"><span style="width:8px;height:8px;border-radius:50%;background:${et?.c};display:inline-block"></span>${et?.n}</div>
+</div>
+<div class="sbd">
+  <div class="ichips">
+    <div class="ic"><div class="icl">Valor</div><div class="icv" style="color:var(--verde)">${p.valf}</div></div>
+    <div class="ic"><div class="icl">Seguimiento</div><div class="icv" style="color:${p.st==='vencida'?'var(--rojo)':p.st==='hoy'?'var(--am)':'var(--negro)'}">${p.f}</div></div>
+    <div class="ic"><div class="icl">Producto</div><div class="icv" style="font-size:12px;font-weight:600">${p.prod}</div></div>
+    <div class="ic"><div class="icl">Vendedor</div><div class="icv" style="font-size:12px">${v?.n}</div></div>
+    <div class="ic icf"><div class="icl">Última nota</div><div class="icv">${p.nota}</div></div>
+  </div>
+  <div class="ht">Historial</div>
+  ${hist.map(h=>`<div class="hi"><div class="hico">${h.i}</div><div class="hcon"><div class="ha">${h.a}</div><div class="hn">${h.n}</div><div class="hf">${h.f}</div></div></div>`).join('')}
+</div>
+<div class="sft">
+  <button class="bwsp" onclick="showToast('En la app real, abre WhatsApp con el contacto directamente.')">💬 WhatsApp</button>
+  <button class="breg" onclick="showToast('Registras llamada, visita o nota, y programas el próximo seguimiento.')">+ Registrar</button>
+</div>`;
+  document.getElementById('sbg').classList.add('open');
+  document.getElementById('sheet').scrollTop=0;
+}
+
+function openChartSheet(){
+  document.getElementById('sheet').innerHTML=`
+<div class="shandle"></div>
+<div class="shd"><div class="shn">Cierres últimos 6 meses</div><div class="shc">Equipo completo</div></div>
+<div class="sbd">
+  <table class="tabla">
+    <thead><tr><th>Mes</th><th style="text-align:right">Cierres</th><th style="text-align:right">vs Meta</th></tr></thead>
+    <tbody>
+      ${MESES.map((m,i)=>{
+        const v=CIERRES_MES[i];const diff=v-META_MES;
+        return`<tr><td>${m} 2025</td><td style="text-align:right;font-family:'JetBrains Mono',monospace;font-weight:700">${v}${i===MESES.length-1?' *':''}</td><td style="text-align:right"><span class="${diff>=0?'chip-v':'chip-r'}">${diff>=0?'+':''}${diff}</span></td></tr>`;
+      }).join('')}
+    </tbody>
+  </table>
+  <div style="font-size:11px;color:var(--muted);margin-top:12px">* Abril en curso — proyección: ${Math.round(CIERRES_MES[5]/15*30)} cierres</div>
+</div>`;
+  document.getElementById('sbg').classList.add('open');
+  document.getElementById('sheet').scrollTop=0;
+}
+
+function closeSheet(e){
+  if(e.target===document.getElementById('sbg'))
+    document.getElementById('sbg').classList.remove('open');
+}
+
+// ════════════════════════════════
+// TOAST
+// ════════════════════════════════
+let _tt;
+function showToast(msg){
+  const t=document.getElementById('toast');
+  t.innerHTML=`<strong>💡</strong> ${msg}`;
+  t.classList.add('on');
+  clearTimeout(_tt);
+  _tt=setTimeout(()=>t.classList.remove('on'),4500);
+}
+
+// ════════════════════════════════
+// CONTRATAR
+// ════════════════════════════════
+function rContratar(){
+  return`
+<div style="font-size:13px;color:var(--muted);margin-bottom:16px;line-height:1.5">¿Quiere esto para su equipo real? Hable directamente con Alfredo Pérez — El Profe de Ventas.</div>
+
+<div style="background:var(--negro);border-radius:14px;padding:22px 18px;margin-bottom:10px;text-align:center">
+  <div style="font-size:10px;color:rgba(255,255,255,.35);font-family:'JetBrains Mono',monospace;letter-spacing:.12em;text-transform:uppercase;margin-bottom:6px">Desde</div>
+  <div style="font-size:40px;font-weight:800;color:#fff;font-family:'JetBrains Mono',monospace;line-height:1;margin-bottom:3px">$35</div>
+  <div style="font-size:12px;color:rgba(255,255,255,.4);margin-bottom:18px">por usuario / mes · Sin contrato</div>
+  <a href="https://wa.me/593XXXXXXXXX?text=Quiero%20contratar%20ORDEN%20PPP%20para%20mi%20equipo" style="display:block;background:#16a34a;color:#fff;font-size:13px;font-weight:700;padding:14px;border-radius:10px;text-decoration:none;margin-bottom:10px" onclick="showToast('En producción, esto abre WhatsApp directamente con Alfredo Pérez.')">💬 Quiero esto para mi equipo</a>
+  <a href="orden-ppp-demo-vendedor.html" style="display:block;background:rgba(255,255,255,.08);color:rgba(255,255,255,.7);font-size:13px;font-weight:600;padding:14px;border-radius:10px;text-decoration:none;margin-bottom:10px">Ver demo del vendedor →</a>
+  <div style="font-size:11px;color:rgba(255,255,255,.25);font-family:'JetBrains Mono',monospace;letter-spacing:.05em">Sin permanencia · Cancela cuando quieras · Su data es suya</div>
+</div>
+
+<div class="sl" style="margin-top:4px">¿Cómo empezar?</div>
+<div class="card">
+${[
+  {i:'💬',n:'1. Conversación de 30 min',d:'Cuénteme cómo opera su equipo. Cuántos vendedores, qué venden, cómo manejan prospectos hoy.'},
+  {i:'⚙️',n:'2. Configuración a su medida',d:'Con 30 años de experiencia en ventas, adapto ORDEN PPP a su operación real. No es una plantilla — es su herramienta.'},
+  {i:'🚀',n:'3. Su equipo operando el día 1',d:'Cargamos los primeros prospectos juntos. Capacitación incluida. En el día están usando el sistema.'},
+  {i:'🤝',n:'4. Soporte directo conmigo',d:'No un bot. No un ticket. Yo mismo. Si algo no funciona o quiere ajustar, me escribe y lo resolvemos.'},
+].map(s=>`<div style="display:flex;align-items:flex-start;gap:12px;padding:13px 16px;border-bottom:1px solid var(--borde)">
+  <span style="font-size:22px;flex-shrink:0;margin-top:1px">${s.i}</span>
+  <div><div style="font-size:13px;font-weight:700;color:var(--negro);margin-bottom:3px">${s.n}</div><div style="font-size:12px;color:var(--muted);line-height:1.4">${s.d}</div></div>
+</div>`).join('')}
+</div>
+
+<div class="card">
+  <div style="padding:14px 16px">
+    <div style="font-size:12px;color:var(--muted);margin-bottom:5px">Construido por</div>
+    <div style="font-size:15px;font-weight:800;color:var(--negro)">Alfredo Pérez</div>
+    <div style="font-size:12px;color:var(--rojo);font-weight:600;margin-top:2px">El Profe de Ventas · +30 años en ventas</div>
+    <div style="font-size:12px;color:var(--muted);margin-top:8px;line-height:1.5">Más de 30 años formando equipos comerciales en Ecuador. ORDEN PPP nació de ver el mismo caos repetirse durante tres décadas. Ahora lo resuelve. Y cuando algo no funciona, habla directamente conmigo.</div>
+  </div>
+</div>`;
+}
+
+// INIT
+nav('dashboard',document.querySelector('.tab.activo'));
+setTimeout(()=>moveLine(document.querySelector('.tab.activo')),60);
+setTimeout(()=>showToast('Dashboard gerencial completo. Toca cualquier dato para más detalle.'),1200);
+
+// Banner flotante — aparece a los 30 seg o al navegar a la 3ª sección
+let _floatShown=false;
+function mostrarFloat(){
+  if(_floatShown)return;
+  _floatShown=true;
+  document.getElementById('ctaFloat').classList.add('visible');
+}
+setTimeout(mostrarFloat,30000);
+let _navCount=0;
+const _navOrig=nav;
+// Interceptar navegación para mostrar al 3er tab visitado
+const tabBtns=document.querySelectorAll('.tab');
+tabBtns.forEach(b=>b.addEventListener('click',()=>{
+  _navCount++;
+  if(_navCount>=3)setTimeout(mostrarFloat,800);
+}));
+
+function cerrarFloat(){
+  document.getElementById('ctaFloat').classList.remove('visible');
+}
+</script>
+</body>
+</html>
